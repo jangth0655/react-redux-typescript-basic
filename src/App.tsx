@@ -1,24 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import { addToDo, deleteToDo } from "./slices/ToDoslice";
+import { useAppDispatch, useAppSelector } from "./store";
 
 function App() {
+  const [text, setText] = useState("");
+  const toDos = useAppSelector((state) => state.todoSlice);
+  const dispatch = useAppDispatch();
+  console.log(toDos);
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    dispatch(addToDo({ text, id: Date.now() }));
+
+    setText("");
+  };
+
+  const onChange = (e: React.FormEvent<HTMLInputElement>) => {
+    setText(e.currentTarget.value);
+  };
+
+  const onDelete = (id: number) => {
+    dispatch(deleteToDo(id));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>ToDoList</h1>
+      <form onSubmit={onSubmit}>
+        <input
+          onChange={onChange}
+          type="text"
+          value={text}
+          placeholder="Write your toDo"
+        />
+        <button>ADD</button>
+      </form>
+      {toDos &&
+        toDos.map((todo) => (
+          <div key={todo.id}>
+            <h1>{todo.text}</h1>
+            <button onClick={() => onDelete(todo.id)}>DEL</button>
+          </div>
+        ))}
     </div>
   );
 }
